@@ -1,5 +1,8 @@
 # Instruções de instalação
 
+Nada por enquanto...
+
+## Bibliotecas utilizadas
 <li> npm i typescript
 <li> npm i express @types/express
 <li> npm i cors @types/cors
