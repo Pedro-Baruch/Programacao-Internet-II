@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { MongoClient } from 'mongodb'
+import { MongoClient } from "mongodb"
 
 interface User{
     id?: string
@@ -9,7 +9,7 @@ interface User{
 }
 
 export class AuthController{
-    
+
     private client: MongoClient
     private db
     private users
@@ -21,9 +21,11 @@ export class AuthController{
         this.users = this.db.collection<User>('users')
     }
 
-    public signup = async (req: Request, res: Response) => {
+    public singup = async (req: Request, res: Response) => {
+        
+        const {email, name, password, confirmpass} = req.body
 
-        const {email, name, password} = req.body
+        // Encriptar senha
 
         const user = {email, name, password}
 
@@ -31,27 +33,31 @@ export class AuthController{
             email
         })
 
-        if (foundUser){
+        if(foundUser){
             return res.status(409).json({error: "Já existe um usuário com este email!"})
         }
-    
-        // save into db
+
+        if(confirmpass != password){
+            return res.status(422).json({error: "As senhas devem ser coincidir!"})
+        }
+        
+        // Salvar no db
         const result = await this.users.insertOne(user)
     
         return res.status(200).json(result)
     }
 
-    public signin = async (req: Request, res: Response) => {
+    public singin = async (req: Request, res: Response) => {
+        
         const {email, password} = req.body
-
 
         const foundUser = await this.users.findOne<User>({
             email, password
         })
 
-        if (!foundUser){
-            return res.status(401).json({error: "Usuário e/ou senha incorretos!"})
-        } 
+        if(!foundUser){
+            return res.status(401).json({error: "Usuário e/ou senha incorretos"})
+        }
 
         return res.json(foundUser)
     }
