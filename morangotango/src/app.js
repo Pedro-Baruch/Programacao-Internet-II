@@ -12,7 +12,7 @@ const app = express()
 app.use(express.json())
 
 // Models
-const User = require('./models/User')
+const User = require('./models/UserRepository')
 
 // Rota publica
 app.get('/', (req, res) => {
