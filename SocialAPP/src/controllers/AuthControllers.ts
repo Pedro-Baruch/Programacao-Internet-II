@@ -1,5 +1,7 @@
 import { Request, Response } from "express"
 import { MongoClient } from "mongodb"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 interface User{
     id?: string
@@ -26,8 +28,8 @@ export class AuthController{
         const {email, name, password, confirmpass} = req.body
 
         // Encriptar senha
-
-        const user = {email, name, password}
+        const salt = await bcrypt.genSalt(12)
+        const passwordHash = await bcrypt.hash(password, salt)
 
         const foundUser = await this.users.findOne<User>({
             email
@@ -40,6 +42,8 @@ export class AuthController{
         if(confirmpass != password){
             return res.status(422).json({error: "As senhas devem ser coincidir!"})
         }
+
+        const user = {email, name, password: passwordHash}
         
         // Salvar no db
         const result = await this.users.insertOne(user)
@@ -51,14 +55,35 @@ export class AuthController{
         
         const {email, password} = req.body
 
-        const foundUser = await this.users.findOne<User>({
-            email, password
-        })
+        // Checar email
+        const user = await this.users.findOne<User>({email})
 
-        if(!foundUser){
-            return res.status(401).json({error: "Usuário e/ou senha incorretos"})
+        if(!user){
+            return res.status(422).json({error: "E-mail incorreto ou não registrado"})
         }
 
-        return res.json(foundUser)
+        // Checar senha
+        const checkPassword = await bcrypt.compare(password, user.password)
+
+        if(!checkPassword){
+            return res.status(422).json({error: "Senha inválida"})
+        }
+
+        try {
+            const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
+
+            const token = jwt.sign({
+                id: user.id
+            },
+            secret)
+
+            res.status(200).json({success: "Autenticação feita com sucesso", token})
+        } catch {
+            console.log('error')
+
+            res.status(500).json({
+                error: "Erro de servidor"
+            })
+        }
     }
 }

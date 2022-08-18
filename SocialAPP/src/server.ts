@@ -13,7 +13,6 @@ app.get('/', (req: Request, res: Response) => {
 
 // Config portas
 const port: number = 3000
-
 app.listen(port, () => {
     console.log(`Start at http://localhost:${port}`)
 })
