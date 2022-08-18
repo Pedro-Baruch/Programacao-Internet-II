@@ -35,10 +35,12 @@ export class AuthController{
             email
         })
 
+        // Checando se usuário já existe
         if(foundUser){
             return res.status(409).json({error: "Já existe um usuário com este email!"})
         }
 
+        // Checando se as senhas são iguais
         if(confirmpass != password){
             return res.status(422).json({error: "As senhas devem ser coincidir!"})
         }
@@ -69,6 +71,7 @@ export class AuthController{
             return res.status(422).json({error: "Senha inválida"})
         }
 
+        // Criando token
         try {
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
