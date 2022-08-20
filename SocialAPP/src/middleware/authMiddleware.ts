@@ -16,7 +16,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         try {
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
-            console.log(jwt.verify(authValue, secret))
+            jwt.verify(authValue, secret)
             
             next()
         } catch (error) {
