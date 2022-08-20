@@ -9,7 +9,7 @@ postRoutes.use(authMiddleware)
 
 postRoutes.post('/add',postController.addPosts)
 postRoutes.get('/list',postController.listPosts)
-postRoutes.post('/delete',postController.deletePosts)
-postRoutes.post('/edit',postController.editPosts)
+postRoutes.delete('/delete',postController.deletePosts)
+postRoutes.put('/edit',postController.editPosts)
 
 export { postRoutes }

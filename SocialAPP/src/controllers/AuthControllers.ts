@@ -66,7 +66,7 @@ export class AuthController{
             return res.status(422).json({error: "Senha inválida"})
         }
 
-        // Criando token
+        // Criando token jwt
         try {
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
@@ -84,5 +84,10 @@ export class AuthController{
                 error: "Erro de servidor"
             })
         }
+    }
+
+    public me = async (req: Request, res: Response) => {
+        
+        res.status(200).json("Teste de rota")
     }
 }
