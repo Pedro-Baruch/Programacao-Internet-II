@@ -12,16 +12,11 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     const [authType, authValue] = auth.split(' ')
 
-    // if(authType === 'basic'){
-
-    // }
-
     if(authType === 'Bearer'){
-        
         try {
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
-            jwt.verify(authValue, secret)
+            console.log(jwt.verify(authValue, secret))
             
             next()
         } catch (error) {
