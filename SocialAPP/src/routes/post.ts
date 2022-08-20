@@ -7,6 +7,9 @@ const postController = new PostController()
 
 postRoutes.use(authMiddleware)
 
-postRoutes.post('/create',postController.create)
+postRoutes.post('/add',postController.addPosts)
+postRoutes.get('/list',postController.listPosts)
+postRoutes.post('/delete',postController.deletePosts)
+postRoutes.post('/edit',postController.editPosts)
 
 export { postRoutes }
