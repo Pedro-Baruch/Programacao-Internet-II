@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
+import { db } from "../data/mongoDB"
+import { User } from "../controllers/AuthControllers";
+import bcrypt from "bcrypt"
 
-
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
     const auth = req.headers.authorization
 
@@ -12,9 +14,21 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     const [authType, authValue] = auth.split(' ')
 
-    // if(authType === 'Basic'){
+    if(authType === 'Basic'){
+        let buff = Buffer.from(authValue, 'base64');
+        let [email, password] = buff.toString('ascii').split(':');
         
-    // }
+        const users = db.collection<User>('users')
+        const user = await users.findOne<User>({email})
+
+        if(!user){
+            res.status(400).json('Token inválido')
+        }
+
+        
+
+        return next()
+    }
 
     if(authType === 'Bearer'){
         try {

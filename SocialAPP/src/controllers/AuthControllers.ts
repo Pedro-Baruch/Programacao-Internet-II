@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 
-interface User{
+export interface User{
     id?: string
     name: string
     email: string

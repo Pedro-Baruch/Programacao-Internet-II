@@ -3,7 +3,6 @@ import { Request, Response } from "express"
 
 interface Post{
     id?: string
-    user_email: string
     text: string
     likes: number
     date: Date
