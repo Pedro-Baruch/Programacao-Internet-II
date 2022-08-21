@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
-import { User } from "../controllers/AuthControllers";
+import { User } from "../interface/UserInterface";
 import bcrypt from "bcrypt"
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -21,11 +21,15 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         const users = db.collection<User>('users')
         const user = await users.findOne<User>({email})
 
-        if(!user){
-            res.status(400).json('Token inválido')
+        if(user){
+            const checkPassword = await bcrypt.compare(password, user.password)
+            
+            if(!checkPassword){
+                return res.status(400).json('Token inválido')
+            }
+        }else{
+            return res.status(400).json('Token inválido')
         }
-
-        
 
         return next()
     }

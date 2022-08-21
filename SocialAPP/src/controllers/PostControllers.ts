@@ -1,12 +1,6 @@
 import { db } from "../data/mongoDB"
 import { Request, Response } from "express"
-
-interface Post{
-    id?: string
-    text: string
-    likes: number
-    date: Date
-}
+import { Post } from "../interface/PostInterface"
 
 export class PostController{
 
@@ -21,7 +15,9 @@ export class PostController{
 
         const post =  {text, likes: 0, date: new Date()}
 
-        return res.status(201).json()
+        const result = await this.posts.insertOne(post)
+
+        return res.status(201).json(result)
     }
 
     public listPosts = async (req: Request, res: Response) => {

@@ -2,13 +2,7 @@ import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
-
-export interface User{
-    id?: string
-    name: string
-    email: string
-    password: string
-}
+import { User } from "../interface/UserInterface"
 
 export class AuthController{
 
