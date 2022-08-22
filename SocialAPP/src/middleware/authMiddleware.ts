@@ -30,8 +30,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         }else{
             return res.status(400).json('Token inválido')
         }
-
-        return next()
     }
 
     if(authType === 'Bearer'){
@@ -39,10 +37,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
             const verify = jwt.verify(authValue, secret)
-
-            next()
         } catch (error) {
             res.status(400).json('Token inválido')
         }
     }
+
+    return next()
 }

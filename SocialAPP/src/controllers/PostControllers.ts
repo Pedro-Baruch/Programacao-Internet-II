@@ -21,7 +21,10 @@ export class PostController{
     }
 
     public listPosts = async (req: Request, res: Response) => {
-        return res.status(201).json('List')
+
+        const list = this.posts.find({})
+
+        return res.status(201).json(list)
     }
 
     public deletePosts = async (req: Request, res: Response) => {
