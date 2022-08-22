@@ -36,7 +36,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         try {
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
-            const verify = jwt.verify(authValue, secret)
+            jwt.verify(authValue, secret)
         } catch (error) {
             res.status(400).json('Token inválido')
         }

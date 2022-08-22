@@ -65,8 +65,7 @@ export class AuthController{
             const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
 
             const token = jwt.sign({
-                email: user.email,
-                password: user.password
+                id: user.id
             },
             secret)
 
