@@ -8,9 +8,9 @@ Repositória feito para guardar projetos relacionandos a matéria de programaç�
 ### Estado atual do projeto
 
 <li>Feito:
-    <ul>Sistema de registro e login</ul>
-    <ul>Auth e Log middleware</ul>
-    <ul>Rotas para post</ul>
+    <p>Sistema de registro e login</p>
+    <p>Auth e Log middleware</p>
+    <p>Rotas para post</p>
 </li>
 
 
