@@ -7,11 +7,11 @@ Repositória feito para guardar projetos relacionandos a matéria de programaç�
 
 ### Estado atual do projeto
 
-<ul>Feito:
-    <li>Sistema de registro e login</li>
-    <li>Auth e Log middleware</li>
-    <li>Rotas para post</li>
-</ul>
+<li>Feito:
+    <ul>Sistema de registro e login</ul>
+    <ul>Auth e Log middleware</ul>
+    <ul>Rotas para post</ul>
+</li>
 
 
 <ul>Não feito:
