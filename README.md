@@ -7,11 +7,11 @@ Repositória feito para guardar projetos relacionandos a matéria de programaç�
 
 ### Estado atual do projeto
 
-<li><b>Feito</b>:
-    <p>Sistema de registro e login</p>
+<ul><b>Feito</b>:
+    <p  >Sistema de registro e login</p>
     <p>Auth e Log middleware</p>
     <p>Rotas para post</p>
-</li>
+</ul>
 
 
 <ul>Não feito:
@@ -20,5 +20,5 @@ Repositória feito para guardar projetos relacionandos a matéria de programaç�
 
 ### Fontes
 
-<li><a href= "https://www.typescriptlang.org"> Typescript </a></li>
+<li><a href= "https://www.typescriptlang.org" src = ""> Typescript </a></li>
 <li></li>
