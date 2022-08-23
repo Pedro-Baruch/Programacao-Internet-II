@@ -3,22 +3,17 @@ Repositória feito para guardar projetos relacionandos a matéria de programaç�
 
 ## SocialAPP
 
-<li>Projeto desenvolvido utilizando typescript, express e mongodb com docker</li>
+Projeto desenvolvido utilizando typescript, express e mongodb com docker
 
-### Estado atual do projeto
+## Estado atual do projeto
 
-<ul><b>Feito</b>:
-    <p  >Sistema de registro e login</p>
-    <p>Auth e Log middleware</p>
-    <p>Rotas para post</p>
-</ul>
+Sistema de registro e login<br>
+Auth e Log middleware<br>
+Rotas para post<br>
 
+## Fontes
 
-<ul>Não feito:
-    <li>Funções de post</li>
-</ul>
-
-### Fontes
-
-<li><a href= "https://www.typescriptlang.org" src = ""> Typescript </a></li>
-<li></li>
+<li><a href= "https://expressjs.com/pt-br/" src = ""> Express </a></li>
+<li><a href= "https://www.mongodb.com/pt-br" src = ""> Mongodb </a></li>
+<li><a href= "https://www.npmjs.com/package/bcrypt" src = ""> Bcrypt </a></li>
+<li><a href= "https://jwt.io/" src = ""> JWT </a></li>
