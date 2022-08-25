@@ -4,7 +4,8 @@
   "description": "projeto feito na materia de programação para internet II",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev -r dotenv/config --respawn --clear src/server.ts"
+    "dev": "ts-node-dev -r dotenv/config --respawn --clear src/server.ts",
+    "dev2": "ts-node-dev -r dotenv/config --clear src/server.ts"
   },
   "author": "Pedro_Baruch",
   "license": "ISC",

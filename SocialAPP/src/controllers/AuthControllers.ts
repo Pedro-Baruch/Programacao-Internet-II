@@ -1,8 +1,11 @@
-import e, { Request, Response } from "express"
+import { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface"
+
+const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
+const refreshSecret: string = JSON.stringify(process.env.SECRET_REFRESH)
 
 export class AuthController{
 
@@ -62,13 +65,9 @@ export class AuthController{
 
         // Criando token jwt
         try {
-            const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
+            const token = jwt.sign({id: user.id}, secret, {expiresIn : '1h'})
 
-            const token = jwt.sign({
-                id: user.id
-            },secret)
-
-            res.status(200).json({success: "Autenticação feita com sucesso", token})
+            res.status(200).json({success: "Autenticação feita com sucesso"})
         } catch {
             console.log('error')
 
@@ -78,8 +77,22 @@ export class AuthController{
         }
     }
 
+    public refresh = async (req: Request, res: Response) => {
+        const { refreshToken } = req.body
+
+        const token = jwt.sign({ refreshToken }, secret, {expiresIn: '1h'})
+        res.status(200).json(token)
+    }
+
     public me = async (req: Request, res: Response) => {
         
         res.status(200).json("Teste de rota")
+    }
+
+    public changepass = async (req: Request, res: Response) => {
+
+        const email = req.body.email
+        
+        res.status(200).json(email)
     }
 }

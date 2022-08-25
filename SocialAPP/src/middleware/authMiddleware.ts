@@ -25,20 +25,20 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             const checkPassword = await bcrypt.compare(password, user.password)
             
             if(!checkPassword){
-                return res.status(400).json('Senha inválida')
+                return res.status(401).json('Senha inválida')
             }
         }else{
-            return res.status(400).json('Email inválido')
+            return res.status(401).json('Email inválido')
         }
     }
 
     if(authType === 'Bearer'){
         try {
-            const secret: string = "lsdJHLGJH12l234kjh23HGJ123JKH89Jjhg2"
+            const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
 
             jwt.verify(authValue, secret)
         } catch (error) {
-            res.status(400).json('Token inválido')
+            res.status(401).json('Token inválido')
         }
     }
 
