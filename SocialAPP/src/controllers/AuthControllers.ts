@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import e, { Request, Response } from "express"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
@@ -66,8 +66,7 @@ export class AuthController{
 
             const token = jwt.sign({
                 id: user.id
-            },
-            secret)
+            },secret)
 
             res.status(200).json({success: "Autenticação feita com sucesso", token})
         } catch {

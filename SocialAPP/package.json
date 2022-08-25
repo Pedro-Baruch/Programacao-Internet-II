@@ -4,7 +4,7 @@
   "description": "projeto feito na materia de programação para internet II",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --clear src/server.ts"
+    "dev": "ts-node-dev -r dotenv/config --respawn --clear src/server.ts"
   },
   "author": "Pedro_Baruch",
   "license": "ISC",
@@ -13,8 +13,7 @@
     "express": "^4.18.1",
     "jose": "^4.9.0",
     "jsonwebtoken": "^8.5.1",
-    "mongodb": "^4.8.1",
-    "ts-dotenv": "^0.8.3"
+    "mongodb": "^4.8.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

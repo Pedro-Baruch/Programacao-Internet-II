@@ -4,5 +4,5 @@ export const logMiddleware = async (req: Request, res: Response, next: NextFunct
 
     const method = req.method
     console.log(`LOG ${Date.now()} - ${method} ${req.originalUrl}`)
-    return next
+    return next()
 }

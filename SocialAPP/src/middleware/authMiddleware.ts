@@ -25,10 +25,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             const checkPassword = await bcrypt.compare(password, user.password)
             
             if(!checkPassword){
-                return res.status(400).json('Token inválido')
+                return res.status(400).json('Senha inválida')
             }
         }else{
-            return res.status(400).json('Token inválido')
+            return res.status(400).json('Email inválido')
         }
     }
 

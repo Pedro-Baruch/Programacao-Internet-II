@@ -1,7 +1,9 @@
 import express, {Request, Response} from 'express'
 import routes from './routes'
+import * as dotenv from 'dotenv';
 
 const app = express()
+dotenv.config();
 
 app.use(express.json()) // Permitir arquivos json
 app.use(routes) // Utilizar as rotas da pasta routes
