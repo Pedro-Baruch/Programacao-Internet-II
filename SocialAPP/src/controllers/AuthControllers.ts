@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface"
 
-const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
-const refreshSecret: string = JSON.stringify(process.env.SECRET_REFRESH)
+const SECRET_ACCESS: string = process.env.SECRET_ACCESS?? ''
+const SECRET_REFRESH: string = process.env.SECRET_REFRESH?? ''
 
 export class AuthController{
 
@@ -37,7 +37,9 @@ export class AuthController{
             return res.status(422).json({error: "As senhas devem ser coincidir!"})
         }
 
-        const user = {email, name, password: passwordHash}
+        const token: string = jwt.sign({email, name}, SECRET_REFRESH, {expiresIn : '30d'}) 
+
+        const user = {token ,email, name, password: passwordHash}
         
         // Salvar no db
         const result = await this.users.insertOne(user)
@@ -65,9 +67,9 @@ export class AuthController{
 
         // Criando token jwt
         try {
-            const token = jwt.sign({id: user.id}, secret, {expiresIn : '1h'})
+            const token = jwt.sign({token: user.token}, SECRET_ACCESS, {expiresIn : '1h'})
 
-            res.status(200).json({success: "Autenticação feita com sucesso"})
+            res.status(200).json({success: "Autenticação feita com sucesso", token})
         } catch {
             console.log('error')
 
@@ -80,8 +82,14 @@ export class AuthController{
     public refresh = async (req: Request, res: Response) => {
         const { refreshToken } = req.body
 
-        const token = jwt.sign({ refreshToken }, secret, {expiresIn: '1h'})
-        res.status(200).json(token)
+        if(!refreshToken){
+            res.status(401).send("Token ausente")
+        }else{
+            const token = jwt.sign({ refreshToken }, SECRET_ACCESS, {expiresIn: '1h'})
+            
+            res.status(200).json({token: token})
+        }
+
     }
 
     public me = async (req: Request, res: Response) => {
@@ -96,3 +104,5 @@ export class AuthController{
         res.status(200).json(email)
     }
 }
+
+export { SECRET_ACCESS, SECRET_REFRESH }

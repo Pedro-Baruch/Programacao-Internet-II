@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken"
+import jwt, { TokenExpiredError } from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface";
 import bcrypt from "bcrypt"
+import { SECRET_ACCESS } from "../controllers/AuthControllers";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -34,11 +35,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     if(authType === 'Bearer'){
         try {
-            const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
-
-            jwt.verify(authValue, secret)
+            const verify = jwt.verify(authValue, SECRET_ACCESS)
+            console.log(verify)
         } catch (error) {
-            res.status(401).json('Token inválido')
+            return res.status(401).send("Token inválido")
         }
     }
 
