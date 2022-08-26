@@ -36,7 +36,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     if(authType === 'Bearer'){
-        
+        try {
+            const decoded = jwt.verify(authValue, accessSecret)
+        } catch (error) {
+            return res.status(401).send({error: "Token inválido"})
+        }
     }
 
     return next()

@@ -65,18 +65,14 @@ export class AuthController{
         }
 
         try {
-            const token = jwt.sign({refreshToken: user.refreshToken}, accessSecret, {expiresIn : '1s'})
+            const token = jwt.sign({refreshToken: user.refreshToken}, accessSecret, {expiresIn : '1h'})
         
-            res.status(200).json({success: "Autenticação feita com sucesso", token})
+            res.status(200).json({success: "Autenticação feita com sucesso",user})
         } catch {
             console.log('error')
 
             res.status(500).json({error: "Erro de servidor"})
         }
-    }
-
-    public refresh = async (req: Request, res: Response) => {
-        
     }
 
     public changepass = async (req: Request, res: Response) => {
@@ -103,9 +99,22 @@ export class AuthController{
         res.status(201).send("Senha alterada com sucesso")
     }
 
-    public me = async (req: Request, res: Response) => {
+    public refresh = async (req: Request, res: Response) => {
         
-        res.status(200).json("Teste de rota")
+    }
+
+    public me = async (req: Request, res: Response) => {
+        const auth = req.headers.authorization
+
+        if(!auth){
+            return res.status(401).json('Credenciais inválidas!')
+        }
+
+        const [authType, authValue] = auth.split(' ')
+
+        const decoded = jwt.decode(authValue)
+        
+        res.status(200).json({decoded})
     }
 
 }
