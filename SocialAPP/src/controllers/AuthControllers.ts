@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface"
 
-const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
-const refreshSecret: string = JSON.stringify(process.env.SECRET_REFRESH)
+const accessSecret:string = process.env.SECRET_ACCESS?? ''
+const refreshSecret: string = process.env.SECRET_REFRESH?? ''
 
 export class AuthController{
 
@@ -37,7 +37,9 @@ export class AuthController{
             return res.status(422).json({error: "As senhas devem ser coincidir!"})
         }
 
-        const user = {email, name, password: passwordHash}
+        const refreshToken = jwt.sign({}, refreshSecret, {expiresIn: '30d'})
+
+        const user = {refreshToken,email, name, password: passwordHash}
         
         // Salvar no db
         const result = await this.users.insertOne(user)
@@ -65,7 +67,7 @@ export class AuthController{
 
         // Criando token jwt
         try {
-            const token = jwt.sign({id: user.id}, secret, {expiresIn : '1h'})
+            const token = jwt.sign({id: user.id}, accessSecret, {expiresIn : '1h'})
 
             res.status(200).json({success: "Autenticação feita com sucesso"})
         } catch {
@@ -80,7 +82,7 @@ export class AuthController{
     public refresh = async (req: Request, res: Response) => {
         const { refreshToken } = req.body
 
-        const token = jwt.sign({ refreshToken }, secret, {expiresIn: '1h'})
+        const token = jwt.sign({ refreshToken }, accessSecret, {expiresIn: '1h'})
         res.status(200).json(token)
     }
 
