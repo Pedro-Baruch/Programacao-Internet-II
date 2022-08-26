@@ -8,7 +8,7 @@ const authController = new AuthController();
 router.post('/singup',authController.singup)
 router.post('/singin',authController.singin)
 router.get('/me', authMiddleware,authController.me)
-router.put('/changepass',authController.changepass)
+router.post('/changepass',authController.changepass)
 router.post('/refresh',authController.refresh)
 
 export default router

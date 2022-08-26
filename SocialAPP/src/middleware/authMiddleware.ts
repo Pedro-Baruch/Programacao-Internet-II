@@ -1,8 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken"
+import jwt, { decode, JsonWebTokenError } from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface";
 import bcrypt from "bcrypt"
+import { jwtVerify } from "jose";
+
+const accessSecret:string = process.env.SECRET_ACCESS?? ''
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -33,14 +36,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     if(authType === 'Bearer'){
-        try {
-            const secret:string = JSON.stringify(process.env.SECRET_ACCESS)
-
-            jwt.verify(authValue, secret)
-        } catch (error) {
-            res.status(401).json('Token inválido')
-        }
+        
     }
 
     return next()
 }
+
