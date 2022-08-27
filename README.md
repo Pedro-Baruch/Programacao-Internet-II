@@ -10,6 +10,8 @@ Projeto desenvolvido utilizando typescript, express e mongodb com docker
 Sistema de registro e login<br>
 Auth e Log middleware<br>
 Rotas para post<br>
+Rota para alteração senha<br>
+Rota refresh token<br>
 
 ## Fontes
 
