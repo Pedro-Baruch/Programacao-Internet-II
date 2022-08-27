@@ -6,6 +6,7 @@ import { User } from "../interface/UserInterface"
 import { encrypt, validPass } from "../helpers/passHelper"
 import { accessSecret, createAccessToken, createRefreshToken } from "../helpers/tokenHelper"
 import { refreshSecret } from "../helpers/tokenHelper"
+import { consumers } from "stream"
 
 export class AuthController{
 
@@ -35,6 +36,7 @@ export class AuthController{
         if(confirmpass != password){
             return res.status(409).json({error: "As senhas devem ser coincidir!"})
         } 
+
 
         const [refreshToken, refreshIAT] = await createRefreshToken(email)
         const [accessToken, accessIAT] = await createAccessToken(refreshToken)
@@ -122,21 +124,29 @@ export class AuthController{
 
     public refresh = async (req: Request, res: Response) => {
         
-        const {email} = req.body
+        const auth = req.headers.authorization
 
-        const foundUser = await this.users.findOne({email: email})
-
-        if(!foundUser){
-            return res.status(409).json({error: "Não existe um usuário com este email!"})
+        if(!auth){
+            return res.status(401).json({error: 'Credenciais inválidas!'})
         }
+
+        const [tokenType, tokenValue] = auth.split(' ')
+
+        const user = await this.users.findOne({refreshToken: tokenValue})
+
+        if(!user){
+            return res.status(409).json({error: "Não existe um usuário relacionado a essa token!"})
+        }
+
+        const email = user.email
 
         try {
             const [refreshToken, refreshIAT] = await createRefreshToken(email)
             const [accessToken, accessIAT] = await createAccessToken(refreshToken)
     
             const filter = { email: email }
-                const updateDocument = {
-                    $set: {
+                 const updateDocument = {
+                     $set: {
                         refreshToken,
                         refreshIAT,
                         accessToken,
@@ -146,8 +156,8 @@ export class AuthController{
             
             this.users.updateOne(filter,updateDocument)
     
-            const result = await this.users.findOne<User>({email: email})
-    
+            const result = await this.users.findOne({email})
+
             return res.status(200).json({result})
         } catch (error) {
             console.log('error')
