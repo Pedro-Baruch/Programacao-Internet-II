@@ -1,11 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { decode, JsonWebTokenError } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface";
-import bcrypt from "bcrypt"
-import { jwtVerify } from "jose";
-
-const accessSecret:string = process.env.SECRET_ACCESS?? ''
+import { accessSecret } from "../helpers/tokenHelper"
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 

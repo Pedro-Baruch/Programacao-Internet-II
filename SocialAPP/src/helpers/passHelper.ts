@@ -8,7 +8,7 @@ export const encrypt = async (pass: string) => {
     return passwordHash
 }
 
-export const verifyPass = async (pass: string) => {
+export const validPass = async (pass: string) => {
 
     const num: string[] = ["1","2","3","4","5","6","7","8","9"]
     const simbols: string[] = ["~","!","@","#","$","%","^","&","*","-","_","+","=","?",">","<"]

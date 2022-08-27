@@ -1,12 +1,11 @@
 import { Request, Response } from "express"
 import bcrypt from "bcrypt"
-import jwt, { JsonWebTokenError } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface"
-import { encrypt, verifyPass } from "../helpers/passHelper"
-
-const accessSecret:string = process.env.SECRET_ACCESS?? ''
-const refreshSecret: string = process.env.SECRET_REFRESH?? ''
+import { encrypt, validPass } from "../helpers/passHelper"
+import { accessSecret, createAccessToken, createRefreshToken } from "../helpers/tokenHelper"
+import { refreshSecret } from "../helpers/tokenHelper"
 
 export class AuthController{
 
@@ -21,11 +20,9 @@ export class AuthController{
         const {email, name, password, confirmpass} = req.body
 
         const passwordHash = await encrypt(password)
-        const ver: number = await verifyPass(password)
+        const ver: number = await validPass(password)
 
-        const foundUser = await this.users.findOne<User>({
-            email
-        })
+        const foundUser = await this.users.findOne<User>({email})
 
         if(foundUser){
             return res.status(409).json({error: "Já existe um usuário com este email!"})
@@ -39,9 +36,18 @@ export class AuthController{
             return res.status(409).json({error: "As senhas devem ser coincidir!"})
         } 
 
-        const refreshToken : string = jwt.sign({email}, refreshSecret, {expiresIn: '30d'})
+        const [refreshToken, refreshIAT] = await createRefreshToken(email)
+        const [accessToken, accessIAT] = await createAccessToken(refreshToken)
 
-        const user = {refreshToken , email , name , password: passwordHash}
+        const user = {
+            email,
+            name,
+            password: passwordHash,
+            refreshToken,
+            refreshIAT,
+            accessToken,
+            accessIAT
+        }
         
         const result = await this.users.insertOne(user)
     
@@ -65,9 +71,24 @@ export class AuthController{
         }
 
         try {
-            const token = jwt.sign({refreshToken: user.refreshToken}, accessSecret, {expiresIn : '1h'})
+            const [refreshToken, refreshIAT] = await createRefreshToken(email)
+            const [accessToken, accessIAT] = await createAccessToken(refreshToken)
         
-            res.status(200).json({success: "Autenticação feita com sucesso",user})
+            const filter = { email: email }
+            const updateDocument = {
+                $set: {
+                    refreshToken,
+                    refreshIAT,
+                    accessToken,
+                    accessIAT
+                }
+            }
+
+            this.users.updateOne(filter,updateDocument)
+
+            const result = await this.users.findOne({email: email})
+
+            res.status(200).json({success: "Autenticação feita com sucesso",result})
         } catch {
             console.log('error')
 
@@ -79,7 +100,7 @@ export class AuthController{
 
         const {email, password} = req.body
 
-        const ver: number = await verifyPass(password)
+        const ver: number = await validPass(password)
 
         if (ver == 0){
             res.status(400).send('Senha incompátivel com nossos critérios')
@@ -101,13 +122,45 @@ export class AuthController{
 
     public refresh = async (req: Request, res: Response) => {
         
+        const {email} = req.body
+
+        const foundUser = await this.users.findOne({email: email})
+
+        if(!foundUser){
+            return res.status(409).json({error: "Não existe um usuário com este email!"})
+        }
+
+        try {
+            const [refreshToken, refreshIAT] = await createRefreshToken(email)
+            const [accessToken, accessIAT] = await createAccessToken(refreshToken)
+    
+            const filter = { email: email }
+                const updateDocument = {
+                    $set: {
+                        refreshToken,
+                        refreshIAT,
+                        accessToken,
+                        accessIAT
+                    }
+            }
+            
+            this.users.updateOne(filter,updateDocument)
+    
+            const result = await this.users.findOne<User>({email: email})
+    
+            return res.status(200).json({result})
+        } catch (error) {
+            console.log('error')
+
+            return res.status(500).json({error: "Erro de servidor"})
+        }
     }
 
     public me = async (req: Request, res: Response) => {
         const auth = req.headers.authorization
 
         if(!auth){
-            return res.status(401).json('Credenciais inválidas!')
+            return res.status(401).json({error: 'Sem credenciais!'})
         }
 
         const [authType, authValue] = auth.split(' ')
