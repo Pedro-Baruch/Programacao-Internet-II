@@ -20,9 +20,17 @@ export const createAccessToken = async (payload: string | number ) => {
     return [ accessToken , accessIAT ]
 }
 
-export const verifyToken = async (tokenValue: string, secret: string) => {
+export const verifyAccessToken = async (tokenValue: string) => {
 
-    let valid: number = 0 // 0 = Expired, 1 = Valid
+    let valid: number = 0 // 0 = Invalid, 1 = Valid
+
+    jwt.verify(tokenValue, accessSecret, function(err,payload){
+        if(err){
+            valid = 0
+        }else{
+            valid = 1
+        }
+    })
 
     if(!tokenValue){
         console.log("Token ausente")
@@ -31,17 +39,23 @@ export const verifyToken = async (tokenValue: string, secret: string) => {
     const users = db.collection('users')
     const iat = await users.findOne({accessToken: tokenValue})
 
-    if(iat){
-        const atualDate = Math.floor(Date.now() / 1000)
-        
-        const isValid = atualDate - iat.accessIAT
-
-        if(isValid > 3600){
-            valid = 0
-        }else{
-            valid = 1
+    if(valid == 1){
+        if(iat){
+            const atualDate = Math.floor(Date.now() / 1000)
+            
+            const isValid = atualDate - iat.accessIAT
+    
+            if(isValid > 3600){
+                valid = 0
+            }else{
+                valid = 1
+            }
         }
     }
 
     return valid
+}
+
+export const verifyRefreshToken = async (tokenValue: string, secret: string) => {
+
 }

@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { db } from "../data/mongoDB"
 import { User } from "../interface/UserInterface";
-import { accessSecret, verifyToken } from "../helpers/tokenHelper"
+import { accessSecret, verifyAccessToken } from "../helpers/tokenHelper"
+import { jwtVerify } from "jose";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -34,13 +35,12 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
 
     if(authType === 'Bearer'){
-        const token: number = await verifyToken(authValue,accessSecret)
+        const valid: number = await verifyAccessToken(authValue)
 
-        if(token == 0){
+        if(valid == 0){
             return res.status(401).send({error: "Token inválido"}) 
         }
     }
 
     return next()
 }
-

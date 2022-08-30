@@ -37,7 +37,6 @@ export class AuthController{
             return res.status(409).json({error: "As senhas devem ser coincidir!"})
         } 
 
-
         const [refreshToken, refreshIAT] = await createRefreshToken(email)
         const [accessToken, accessIAT] = await createAccessToken(refreshToken)
 
