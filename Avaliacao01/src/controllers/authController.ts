@@ -1,8 +1,8 @@
 import { db } from "../data/mongodb";
 import { User } from "../repository/userRepository";
 import { Request, Response } from "express";
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import { decrypt, encrypt } from "../helpers/passHelper";
+import { generateToken, refreshVerifyJWT } from "../helpers/tokenHelper";
 
 export class AuthController{
     private users
@@ -17,6 +17,7 @@ export class AuthController{
 
         // Verificar se usuário pode criar uma conta
         const foundUser = await this.users.findOne<User>({email})
+        
         if(foundUser){
             return res.status(400).send({error: "Email já cadastrado!"})
         }
@@ -26,8 +27,7 @@ export class AuthController{
         }
 
         // Encriptar senha
-        const salt: string = await bcrypt.genSalt(12)
-        const passwordHash: string = await bcrypt.hash(password, salt)
+        const passwordHash = await encrypt(password)
 
         const refreshToken: string = ""; const refreshIAT: number = 0; const accessToken: string = ""; const accessIAT: number = 0
 
@@ -57,33 +57,14 @@ export class AuthController{
             return res.status(404).send({error: "Usuário não registrado!"})
         }
     
-        const verifyPassword = await bcrypt.compare(password, user.password)
+        const verifyPassword: boolean = await decrypt(password, user.password)
         if(verifyPassword == false){
             return res.status(400).send({error: "Senha incorreta!"})
         }
 
         // Gerando access e refresh token e salvando no db
-        const refreshSecret:string = process.env.SECRET_REFRESH?? ''
-        const accessSecret:string = process.env.SECRET_ACCESS?? ''
-
         try {
-            const refreshIAT:number = Math.floor(Date.now() / 1000)
-            const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret,{expiresIn: "30d"})
-
-            const accessIAT:number = Math.floor(Date.now() / 1000)
-            const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret,{expiresIn: "1h"})
-
-            const filter = {email}
-            const updateDocument = {
-                $set: {
-                    refreshToken,
-                    refreshIAT,
-                    accessToken,
-                    accessIAT
-                }
-            }
-
-            await this.users.updateOne(filter,updateDocument)
+            const [accessToken, refreshToken]:string[] = await generateToken(user._id, user.email)
 
             res.status(200).send({msg: "Logado com sucesso!", accessToken: accessToken})
         } catch (error) { 
@@ -108,14 +89,7 @@ export class AuthController{
         }
         
         // Verificando token pelo jwt
-        const refreshSecret:string = process.env.SECRET_REFRESH?? ''
-        let verify:boolean = false
-
-        jwt.verify(token, refreshSecret, function (err, payload){
-            if(payload){
-                return verify = true
-            }
-        })
+        const verify:boolean = refreshVerifyJWT(token)
         
         // Verificando a válidade no db
         if(verify == false){
@@ -130,26 +104,8 @@ export class AuthController{
         }
         
         // Gerando um novo par de tokens
-        const accessSecret:string = process.env.SECRET_ACCESS?? ''
-        
         try {
-            const refreshIAT:number = Math.floor(Date.now() / 1000)
-            const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret,{expiresIn: "30d"})
-            
-            const accessIAT:number = Math.floor(Date.now() / 1000)
-            const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret,{expiresIn: "1h"})
-            
-            const filter = {email: user.email}
-            const updateDocument = {
-                $set: {
-                    refreshToken,
-                    refreshIAT,
-                    accessToken,
-                    accessIAT
-                }
-            }
-            
-            await this.users.updateOne(filter,updateDocument)
+            const [accessToken, refreshToken]:string[] = await generateToken(user._id, user.email)
             
             res.status(200).send({msg: "Tokens renovados", accessToken: accessToken, refreshToken: refreshToken})
         } catch (error) {
@@ -168,8 +124,7 @@ export class AuthController{
         }
 
         // Encriptando nova senha
-        const salt: string = await bcrypt.genSalt(12)
-        const passwordHash: string = await bcrypt.hash(password, salt)
+        const passwordHash = await encrypt(password)
 
         const filter = {email}
         const updateDocument = {

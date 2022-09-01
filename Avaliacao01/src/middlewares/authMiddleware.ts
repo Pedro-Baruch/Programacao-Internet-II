@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken"
 import { Request, Response, NextFunction } from "express"
 import { db } from "../data/mongodb"
+import { accessVerifyJWT } from "../helpers/tokenHelper"
 
 export const AuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     
@@ -15,14 +15,7 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
     if(type == 'Bearer'){
         
         // Verificando token pelo jwt
-        const accessSecret:string = process.env.SECRET_ACCESS?? ''
-        let verify: boolean = false
-
-        jwt.verify(token, accessSecret, function (err, payload){
-            if(payload){
-                return verify = true
-            }
-        })
+        let verify: boolean = accessVerifyJWT(token)
 
         // Verificando a validade no db
         if(verify == false){
