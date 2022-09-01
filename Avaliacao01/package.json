@@ -1,0 +1,28 @@
+{
+  "name": "avaliacao01",
+  "version": "1.0.0",
+  "description": "Setup projeto",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev -r dotenv/config --respawn --clear src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^18.7.14",
+    "dotenv": "^16.0.2",
+    "ts-node-dev": "^2.0.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.8.2"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.13",
+    "bcrypt": "^5.0.1",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.9.1"
+  }
+}
