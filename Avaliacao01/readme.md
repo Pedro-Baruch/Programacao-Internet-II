@@ -1,26 +1,34 @@
-Setup projeto
+## O que foi usado
 
-Express
-Mongodb
-Jsonwebtoken
-Brycpt
+		Express
+		Mongodb
+		Jsonwebtoken
+		Brycpt
+		Typescript
 
-Typescript
+## Estrutura do projeto
 
-estrutura do projeto
+		src
+		- controllers:
+			- authController.ts
+		- data:
+			- mongodb.ts
+		- middlewares: 
+			- authMiddleware.ts
+		- helpers: 
+			- passHelper.ts
+			- tokenHelper.ts
+		- repository: 
+			 - userRepository.ts
+		- routes: 
+			 - authRoutes.ts
+			 - index.ts
+		- server.ts: express config
 
-controllers
-data
-middlewares
-helpers
-repository
-routes
-server.ts
+## Feito
 
-Feito
-
-Registro encriptando a senha do usuário usando bcrypt
-Login gerando um access token e um refresh token
-auth middleware 
-Rota refresh feita
-Rota alterar senha
+- Rota de registro salvando a senha do usuário encriptada utilizando o "bcrypt";
+- Rota de login gerando um access token e um refresh token;
+- Funçao authMiddleware; 
+- Rota refresh retornando um par de tokens novos;
+- Rota alterar senha (sem politica de senha)
