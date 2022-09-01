@@ -31,4 +31,3 @@
 - Rota de login gerando um access token e um refresh token;
 - Funçao authMiddleware usando jwt; 
 - Rota refresh retornando um par de tokens novos;
-- Rota alterar senha (sem politica de senha)

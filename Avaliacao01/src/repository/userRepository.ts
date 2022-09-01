@@ -3,6 +3,8 @@ export interface User{
     email: string
     name: string
     password: string
+    telefone: number
+    contaAtiva: boolean
     accessToken: string
     accessIAT: number
     refreshToken: string

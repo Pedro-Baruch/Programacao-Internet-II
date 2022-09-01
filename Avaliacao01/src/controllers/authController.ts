@@ -13,7 +13,7 @@ export class AuthController{
 
     public singup = async (req: Request, res: Response) => {
         
-        const {email, name, password, confirmPassword} = req.body
+        const {email, name, password, confirmPassword, telefone} = req.body
 
         // Verificar se usuário pode criar uma conta
         const foundUser = await this.users.findOne({email})
@@ -30,11 +30,14 @@ export class AuthController{
         const passwordHash: string = await encrypt(password)
 
         const refreshToken: string = ""; const refreshIAT: number = 0; const accessToken: string = ""; const accessIAT: number = 0
+        const contaAtiva: boolean = false
 
         const user = {
             email,
             name,
             password: passwordHash,
+            telefone,
+            contaAtiva,
             refreshToken,
             refreshIAT,
             accessToken,
