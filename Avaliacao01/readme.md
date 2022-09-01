@@ -29,6 +29,6 @@
 
 - Rota de registro salvando a senha do usuário encriptada utilizando o "bcrypt";
 - Rota de login gerando um access token e um refresh token;
-- Funçao authMiddleware; 
+- Funçao authMiddleware usando jwt; 
 - Rota refresh retornando um par de tokens novos;
 - Rota alterar senha (sem politica de senha)
