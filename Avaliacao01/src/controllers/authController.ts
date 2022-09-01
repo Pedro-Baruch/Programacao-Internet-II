@@ -16,7 +16,7 @@ export class AuthController{
         const {email, name, password, confirmPassword} = req.body
 
         // Verificar se usuário pode criar uma conta
-        const foundUser = await this.users.findOne<User>({email})
+        const foundUser = await this.users.findOne({email})
         
         if(foundUser){
             return res.status(400).send({error: "Email já cadastrado!"})
@@ -27,7 +27,7 @@ export class AuthController{
         }
 
         // Encriptar senha
-        const passwordHash = await encrypt(password)
+        const passwordHash: string = await encrypt(password)
 
         const refreshToken: string = ""; const refreshIAT: number = 0; const accessToken: string = ""; const accessIAT: number = 0
 
@@ -78,14 +78,14 @@ export class AuthController{
         const auth = req.headers.authorization
         
         if(!auth){
-            return res.status(400).send({msg: "Token inválido ou inexistente!"})
+            return res.status(401).send({msg: "Token inválido ou inexistente!"})
         }
 
         const [type, token] = auth.split(" ")
         const user = await db.collection('users').findOne({refreshToken: token})
         
         if(!user){
-            return res.status(404).send({error: "Token inválido!"})
+            return res.status(401).send({error: "Token inválido!"})
         }
         
         // Verificando token pelo jwt
@@ -93,13 +93,13 @@ export class AuthController{
         
         // Verificando a válidade no db
         if(verify == false){
-            return res.status(400).send({error: "Token inválido!"})
+            return res.status(401).send({error: "Token inválido!"})
         }else{            
-            const currentDate = Math.floor(Date.now() / 1000)
-            const valid = currentDate - user.refreshIAT
+            const currentDate: number = Math.floor(Date.now() / 1000)
+            const valid: number = currentDate - user.refreshIAT
             
             if(valid > 2592000){
-                return res.status(400).send({error: "Token inválido!"})
+                return res.status(401).send({error: "Token inválido!"})
             }
         }
         
@@ -124,7 +124,7 @@ export class AuthController{
         }
 
         // Encriptando nova senha
-        const passwordHash = await encrypt(password)
+        const passwordHash: string = await encrypt(password)
 
         const filter = {email}
         const updateDocument = {

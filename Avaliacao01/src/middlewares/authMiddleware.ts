@@ -7,7 +7,7 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
     const auth = req.headers.authorization
 
     if(!auth){
-        return res.status(400).send({msg: "Token inválido ou inexistente!"})
+        return res.status(401).send({msg: "Token inválido ou inexistente!"})
     }
 
     const [type, token] = auth.split(" ")
@@ -19,19 +19,19 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
 
         // Verificando a validade no db
         if(verify == false){
-            return res.status(400).send({error: "Token inválido!"})
+            return res.status(401).send({error: "Token inválido!"})
         }else{
             const user = await db.collection('users').findOne({accessToken: token})
 
             if(!user){
-                return res.status(404).send({error: "Token inválido!"})
+                return res.status(401).send({error: "Token inválido!"})
             }
             
-            const currentDate = Math.floor(Date.now() / 1000)
-            const valid = currentDate - user.accessIAT
+            const currentDate: number = Math.floor(Date.now() / 1000)
+            const valid: number = currentDate - user.accessIAT
 
             if(valid > 3600){
-                return res.status(400).send({error: "Token expirado!"})
+                return res.status(401).send({error: "Token inválido!"})
             }
         }
 
