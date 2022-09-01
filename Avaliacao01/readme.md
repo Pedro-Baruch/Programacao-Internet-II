@@ -22,3 +22,4 @@ Registro encriptando a senha do usuário usando bcrypt
 Login gerando um access token e um refresh token
 auth middleware 
 Rota refresh feita
+Rota alterar senha

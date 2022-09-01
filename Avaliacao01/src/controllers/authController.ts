@@ -91,23 +91,11 @@ export class AuthController{
         }
     }
 
-    public me = async (req: Request, res: Response) => {
-
-        const auth = req.headers.authorization
-
-        if(!auth){
-            return res.status(400).send({msg: "Token inválido ou inexistente!"})
-        }
-
-        const [type, token] = auth.split(" ")
-
-        res.status(200).send({msg: "Deu certo eu acho!"})
-    }
-
+    
     public refresh = async (req: Request, res: Response) => {
-
+        
         const auth = req.headers.authorization
-
+        
         if(!auth){
             return res.status(400).send({msg: "Token inválido ou inexistente!"})
         }
@@ -118,7 +106,7 @@ export class AuthController{
         if(!user){
             return res.status(404).send({error: "Token inválido!"})
         }
-
+        
         // Verificando token pelo jwt
         const refreshSecret:string = process.env.SECRET_REFRESH?? ''
         let verify:boolean = false
@@ -128,29 +116,29 @@ export class AuthController{
                 return verify = true
             }
         })
-
+        
         // Verificando a válidade no db
         if(verify == false){
             return res.status(400).send({error: "Token inválido!"})
         }else{            
             const currentDate = Math.floor(Date.now() / 1000)
             const valid = currentDate - user.refreshIAT
-
+            
             if(valid > 2592000){
                 return res.status(400).send({error: "Token inválido!"})
             }
         }
-
+        
         // Gerando um novo par de tokens
         const accessSecret:string = process.env.SECRET_ACCESS?? ''
-
+        
         try {
             const refreshIAT:number = Math.floor(Date.now() / 1000)
             const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret,{expiresIn: "30d"})
-
+            
             const accessIAT:number = Math.floor(Date.now() / 1000)
             const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret,{expiresIn: "1h"})
-
+            
             const filter = {email: user.email}
             const updateDocument = {
                 $set: {
@@ -160,12 +148,43 @@ export class AuthController{
                     accessIAT
                 }
             }
-
+            
             await this.users.updateOne(filter,updateDocument)
-
+            
             res.status(200).send({msg: "Tokens renovados", accessToken: accessToken, refreshToken: refreshToken})
         } catch (error) {
             return res.status(500).send({error: "Erro de servidor"})
         }
+    }
+
+    public changePass = async (req: Request, res: Response) => {
+
+        const {email, password} = req.body
+
+        const users = await db.collection('users').findOne({email})
+
+        if(!users){
+            return res.status(404).send({error: "Usuário não encontrado!"})
+        }
+
+        // Encriptando nova senha
+        const salt: string = await bcrypt.genSalt(12)
+        const passwordHash: string = await bcrypt.hash(password, salt)
+
+        const filter = {email}
+        const updateDocument = {
+            $set: {
+                password: passwordHash
+            }
+        }
+
+        await this.users.updateOne(filter,updateDocument)
+
+        res.status(201).send({msg: "Senha atualizada"})
+    }
+    
+    public me = async (req: Request, res: Response) => {
+    
+        res.status(200).send({msg: "Deu certo eu acho!"})
     }
 }
