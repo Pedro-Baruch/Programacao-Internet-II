@@ -12,7 +12,3 @@ export const decrypt = async (firstPassword: string, secondPassword: string) => 
 
     return verifyPassword
 }
-
-export const verifyPass = async (password:string) => {
-    
-}

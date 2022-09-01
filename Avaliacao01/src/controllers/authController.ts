@@ -115,31 +115,6 @@ export class AuthController{
             return res.status(500).send({error: "Erro de servidor"})
         }
     }
-
-    public changePass = async (req: Request, res: Response) => {
-
-        const {email, password} = req.body
-
-        const users = await db.collection('users').findOne({email})
-
-        if(!users){
-            return res.status(404).send({error: "Usuário não encontrado!"})
-        }
-
-        // Encriptando nova senha
-        const passwordHash: string = await encrypt(password)
-
-        const filter = {email}
-        const updateDocument = {
-            $set: {
-                password: passwordHash
-            }
-        }
-
-        await this.users.updateOne(filter,updateDocument)
-
-        res.status(201).send({msg: "Senha atualizada"})
-    }
     
     public me = async (req: Request, res: Response) => {
     
