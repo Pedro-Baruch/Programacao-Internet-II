@@ -1,29 +1,29 @@
 ## O que foi usado
 
-		Express
-		Mongodb
-		Jsonwebtoken
-		Brycpt
-		Typescript
+	Express
+	Mongodb
+	Jsonwebtoken
+	Brycpt
+	Typescript
 
 ## Estrutura do projeto
 
-		src
-		- controllers:
-			- authController.ts
-		- data:
-			- mongodb.ts
-		- middlewares: 
-			- authMiddleware.ts
-		- helpers: 
-			- passHelper.ts
-			- tokenHelper.ts
-		- repository: 
-			 - userRepository.ts
-		- routes: 
-			 - authRoutes.ts
-			 - index.ts
-		- server.ts: express config
+	src
+		controllers:
+			authController.ts
+		data:
+			mongodb.ts
+		middlewares: 
+			authMiddleware.ts
+		helpers: 
+			passHelper.ts
+			tokenHelper.ts
+		repository: 
+			 userRepository.ts
+		routes: 
+			 authRoutes.ts
+			 index.ts
+		server.ts: express config
 
 ## Feito
 
