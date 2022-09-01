@@ -62,16 +62,16 @@ export class AuthController{
             return res.status(400).send({error: "Senha incorreta!"})
         }
 
-        // Gerando access e refresh token
+        // Gerando access e refresh token e salvando no db
         const refreshSecret:string = process.env.SECRET_REFRESH?? ''
         const accessSecret:string = process.env.SECRET_ACCESS?? ''
 
         try {
             const refreshIAT:number = Math.floor(Date.now() / 1000)
-            const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret)
+            const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret,{expiresIn: "30d"})
 
             const accessIAT:number = Math.floor(Date.now() / 1000)
-            const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret)
+            const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret,{expiresIn: "1h"})
 
             const filter = {email}
             const updateDocument = {
@@ -85,16 +85,87 @@ export class AuthController{
 
             await this.users.updateOne(filter,updateDocument)
 
-            res.status(200).send({msg: "Logado com sucessor", accessToken: accessToken})
-        } catch (error) {
-            console.log(error)
-
+            res.status(200).send({msg: "Logado com sucesso!", accessToken: accessToken})
+        } catch (error) { 
             return res.status(500).send({error:"erro de servidor"})
         }
     }
 
     public me = async (req: Request, res: Response) => {
 
+        const auth = req.headers.authorization
+
+        if(!auth){
+            return res.status(400).send({msg: "Token inválido ou inexistente!"})
+        }
+
+        const [type, token] = auth.split(" ")
+
+        res.status(200).send({msg: "Deu certo eu acho!"})
+    }
+
+    public refresh = async (req: Request, res: Response) => {
+
+        const auth = req.headers.authorization
+
+        if(!auth){
+            return res.status(400).send({msg: "Token inválido ou inexistente!"})
+        }
+
+        const [type, token] = auth.split(" ")
+        const user = await db.collection('users').findOne({refreshToken: token})
         
+        if(!user){
+            return res.status(404).send({error: "Token inválido!"})
+        }
+
+        // Verificando token pelo jwt
+        const refreshSecret:string = process.env.SECRET_REFRESH?? ''
+        let verify:boolean = false
+
+        jwt.verify(token, refreshSecret, function (err, payload){
+            if(payload){
+                return verify = true
+            }
+        })
+
+        // Verificando a válidade no db
+        if(verify == false){
+            return res.status(400).send({error: "Token inválido!"})
+        }else{            
+            const currentDate = Math.floor(Date.now() / 1000)
+            const valid = currentDate - user.refreshIAT
+
+            if(valid > 2592000){
+                return res.status(400).send({error: "Token inválido!"})
+            }
+        }
+
+        // Gerando um novo par de tokens
+        const accessSecret:string = process.env.SECRET_ACCESS?? ''
+
+        try {
+            const refreshIAT:number = Math.floor(Date.now() / 1000)
+            const refreshToken:string = jwt.sign({_id: user._id, iat:refreshIAT}, refreshSecret,{expiresIn: "30d"})
+
+            const accessIAT:number = Math.floor(Date.now() / 1000)
+            const accessToken:string = jwt.sign({refreshToken, iat: accessIAT}, accessSecret,{expiresIn: "1h"})
+
+            const filter = {email: user.email}
+            const updateDocument = {
+                $set: {
+                    refreshToken,
+                    refreshIAT,
+                    accessToken,
+                    accessIAT
+                }
+            }
+
+            await this.users.updateOne(filter,updateDocument)
+
+            res.status(200).send({msg: "Tokens renovados", accessToken: accessToken, refreshToken: refreshToken})
+        } catch (error) {
+            return res.status(500).send({error: "Erro de servidor"})
+        }
     }
 }
