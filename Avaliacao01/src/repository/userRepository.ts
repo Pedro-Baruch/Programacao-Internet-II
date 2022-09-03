@@ -4,7 +4,6 @@ export interface User{
     name: string
     password: string
     telefone: number
-    telefoneAtivo: boolean
     contaAtiva: boolean
     accessToken: string
     accessIAT: number

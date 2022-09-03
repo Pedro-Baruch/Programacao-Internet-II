@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 import { db } from "../data/mongodb"
-import { ActivateEmail } from "../repository/activateRepository"
+import { ActivateEmail } from "../repository/activateEmailRepository"
 
 export const activateAccountEmail = async (email: string, content: Promise<number>) => {
 
@@ -38,7 +38,7 @@ export const generateCode = async (email: string) => {
     }
 
     const currentDate = Math.floor(Date.now() / 1000)
-    const expDate = currentDate + 7200
+    const expDate = currentDate - 7200
     
     const activate = {
         userEmail: email,
@@ -55,7 +55,7 @@ const generateNum = () => {
     return Math.floor(Math.random() * 65536)
 }
 
-// export const generateCode = async () => {
+// export const generatekey = async () => {
     
 //     const secret: string = process.env.SECRET?? ''
 

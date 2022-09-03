@@ -1,10 +1,12 @@
 import { db } from "../data/mongodb";
 import { User } from "../repository/userRepository";
-import { Request, Response } from "express";
+import { Request, Response, urlencoded } from "express";
 import { decrypt, encrypt } from "../helpers/passHelper";
 import { generateToken, refreshVerifyJWT } from "../helpers/tokenHelper";
 import { activateAccountEmail, generateCode } from "../helpers/emailHelper";
-import { ActivateEmail } from "../repository/activateRepository";
+import { ActivateEmail } from "../repository/activateEmailRepository";
+import { generateCodeTelefone } from "../helpers/telefoneHelper";
+import { ActivateTelefone } from "../repository/activeTelefone";
 
 export class AuthController{
     private users
@@ -36,7 +38,6 @@ export class AuthController{
             name,
             password: passwordHash,
             telefone: 0,
-            telefoneAtivo: false,
             contaAtiva: false,
             refreshToken: "",
             refreshIAT: 0,
@@ -53,18 +54,10 @@ export class AuthController{
         return res.status(201).send({msg: "Usuário criado com sucesso!"})
     }
 
-    public addTelefone = async (req: Request, res: Response) => {
-
-    }
-
-    public ativarTelefone = async (req: Request, res: Response) =>{
-
-    }
-
     public ativarEmail = async (req: Request, res: Response) => {
-
+        
         const {email, code} = req.body
-
+        
         const activateEmail = db.collection<ActivateEmail>('ActivateEmail')
         const foundCode = await activateEmail.findOne({userEmail: email})
 
@@ -88,15 +81,65 @@ export class AuthController{
                     contaAtiva
                 }
             }
+            
+            await this.users.updateOne(filter,updateDocument)
+        }
+        
+        return res.status(200).send({msg: 'Conta ativada com sucesso!'})
+    }
+    
+    public addTelefone = async (req: Request, res: Response) => {
+
+        const {telefone, email} = req.body
+
+        const user = await this.users.findOne({email})
+
+        if(!user){
+            return res.status(404).send({error: "Usuário não registrado!"})
+        }
+
+        if(user.telefone == telefone){
+            return res.status(400).send({error: "Telefone já registrado"})
+        }
+
+        if(user.contaAtiva == false){
+            return res.status(400).send({error: "Conta não ativada"})
+        }
+
+        const code = generateCodeTelefone(telefone, email)
+        console.log('Ativação por sms do número:',telefone,'->',await code)
+
+        return res.status(201).send({msg: "OK :)"})
+    }
+
+    public activateTelefone = async (req: Request, res: Response) =>{
+
+        const {telefone, code} = req.body
+
+        const activate = await db.collection<ActivateTelefone>('activateTelefone').findOne({userTelefone: telefone})
+
+        if(!activate){
+            return res.status(404).send({error: "Telefone não registrado!"})
+        }
+
+        if(activate.code == code){
+            const email = activate.userEmail
+            
+            const filter = {email}
+            const updateDocument = {
+                $set: {
+                    telefone
+                }
+            }
 
             await this.users.updateOne(filter,updateDocument)
         }
 
-        return res.status(200).send({msg: 'Conta ativada com sucesso!'})
+        return res.status(200).send({msg: "Telefone ativado com sucesso!"})
     }
 
     public singin = async (req: Request, res: Response) => {
-
+        
         const {email, password} = req.body
 
         // Verificar se usuário pode logar
