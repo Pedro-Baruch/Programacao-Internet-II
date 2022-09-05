@@ -27,14 +27,14 @@ export const activateAccountEmail = async (email: string, content: Promise<numbe
 export const generateCode = async (email: string) => {
 
     const activateEmail = db.collection<ActivateEmail>('ActivateEmail')
-    
     let code: number = generateNum()
+    
+    const foundCode = await activateEmail.findOne({code})
+
     for(code;code <= 9999; code = generateNum()){} // verifica se codigo é maior que 4 digitos
 
-    const foundCode = await activateEmail.findOne({code})
-    
     if(foundCode){ // verifica se existe com código igual no db
-        for(code; code == foundCode.code; code = generateNum()){} 
+        for(code; code == foundCode.code || code <= 9999; code = generateNum()){}
     }
 
     const currentDate = Math.floor(Date.now() / 1000)
@@ -54,26 +54,3 @@ export const generateCode = async (email: string) => {
 const generateNum = () => {
     return Math.floor(Math.random() * 65536)
 }
-
-// export const generatekey = async () => {
-    
-//     const secret: string = process.env.SECRET?? ''
-
-//     generateKeyPair('rsa', {
-//         modulusLength: 4096,
-//         publicKeyEncoding: {
-//             type: 'spki',
-//             format: 'pem'
-//         },
-//         privateKeyEncoding: {
-//             type: 'pkcs8',
-//             format: 'pem',
-//             cipher: 'aes-256-cbc',
-//             passphrase: secret
-//         }
-//     }, (err, publicKey, privateKey) => {
-//         fs.writeFileSync('public.pem', publicKey);
-//         fs.writeFileSync('private.key', privateKey);
-//         }
-//     )
-// }

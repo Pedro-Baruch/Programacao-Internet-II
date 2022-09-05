@@ -1,6 +1,6 @@
 import { db } from "../data/mongodb";
 import { User } from "../repository/userRepository";
-import { Request, Response, urlencoded } from "express";
+import { Request, Response } from "express";
 import { decrypt, encrypt } from "../helpers/passHelper";
 import { generateToken, refreshVerifyJWT } from "../helpers/tokenHelper";
 import { activateAccountEmail, generateCode } from "../helpers/emailHelper";

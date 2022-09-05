@@ -4,14 +4,14 @@ import { ActivateTelefone } from "../repository/activeTelefone"
 export const generateCodeTelefone = async (telefone: number, email: string) => {
     
     const activateTelefone = db.collection<ActivateTelefone>('activateTelefone')
-
     let code: number = generateNum()
+    
+    const foundCode = await activateTelefone.findOne({code})
+    
     for(code;code <= 9999; code = generateNum()){}
 
-    const foundCode = await activateTelefone.findOne({code})
-
     if(foundCode){
-        for(code; code == foundCode.code; code = generateNum()){} 
+        for(code; code == foundCode.code || code <= 9999; code = generateNum()){} 
     }
 
     const currentDate = Math.floor(Date.now() / 1000)
