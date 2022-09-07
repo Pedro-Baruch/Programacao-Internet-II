@@ -3,5 +3,5 @@ export interface ActivateTelefone{
     userEmail: string
     userTelefone: number
     code: number
-    expDate: number
+    iatDate: number
 }

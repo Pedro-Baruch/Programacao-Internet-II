@@ -3,9 +3,9 @@ import { User } from "../repository/userRepository";
 import { Request, Response } from "express";
 import { decrypt, encrypt } from "../helpers/passHelper";
 import { generateToken, refreshVerifyJWT } from "../helpers/tokenHelper";
-import { sendActivateEmail, generateCode } from "../helpers/emailHelper";
+import { sendActivateEmail, createCodeEmail, refreshCode } from "../helpers/emailHelper";
 import { ActivateEmail } from "../repository/activateEmailRepository";
-import { generateCodeTelefone } from "../helpers/telefoneHelper";
+import { createCodeTelefone, refreshTelefone } from "../helpers/telefoneHelper";
 import { ActivateTelefone } from "../repository/activeTelefone";
 
 export class AuthController{
@@ -45,7 +45,7 @@ export class AuthController{
             accessIAT: 0
         }
 
-        const code = generateCode(email)
+        const code = createCodeEmail(email)
         sendActivateEmail(email, code)
         
         // Salvando no banco de dados
@@ -66,30 +66,37 @@ export class AuthController{
         }
 
         const currentDate = Math.floor(Date.now() / 1000)
-        const valid = foundCode.expDate - currentDate
+        const valid: number = currentDate - foundCode.iatDate
 
-        if(valid < 7200){
+        if(valid > 7200){
             return res.status(400).send({error: 'Código inválido'})
         }
 
-        if(code == foundCode.code){
-            const contaAtiva: boolean = true
+        if(code != foundCode.code){
+            return res.status(400).send({error: 'Código inválido'})
+        }
 
-            const filter = {email}
-            const updateDocument = {
-                $set: {
-                    contaAtiva
-                }
+        const contaAtiva: boolean = true
+
+        const filter = {email}
+        const updateDocument = {
+            $set: {
+                contaAtiva
             }
-            
-            await this.users.updateOne(filter,updateDocument)
         }
         
+        await this.users.updateOne(filter,updateDocument)
+
         return res.status(200).send({msg: 'Conta ativada com sucesso!'})
     }
 
     public refreshEmail = async (req: Request, res: Response) => {
         
+        const {email} = req.body
+        
+        await refreshCode(email)
+
+        return res.status(200).send({msg: email})
     }
     
     public addTelefone = async (req: Request, res: Response) => {
@@ -110,14 +117,19 @@ export class AuthController{
             return res.status(400).send({error: "Conta não ativada"})
         }
 
-        const code = generateCodeTelefone(telefone, email)
+        const code = createCodeTelefone(telefone, email)
         console.log('Ativação por sms do número:',telefone,'->',await code)
 
         return res.status(201).send({msg: "OK :)"})
     }
 
     public refreshTelefone = async (req: Request, res: Response) => {
+        
+        const {telefone} = req.body
 
+        refreshTelefone(telefone)
+
+        return res.status(200).send({msg: telefone})
     }
 
     public activateTelefone = async (req: Request, res: Response) =>{
@@ -131,24 +143,26 @@ export class AuthController{
         }
 
         const currentDate = Math.floor(Date.now() / 1000)
-        const valid = activate.expDate - currentDate
+        const valid = currentDate - activate.iatDate
 
-        if(valid < 3600){
+        if(valid > 3600){
             return res.status(400).send({error: 'Código inválido'})
         }
 
-        if(activate.code == code){
-            const email = activate.userEmail
-            
-            const filter = {email}
-            const updateDocument = {
-                $set: {
-                    telefone
-                }
-            }
-
-            await this.users.updateOne(filter,updateDocument)
+        if(code != activate.code){
+            return res.status(400).send({error: 'Código inválido'})
         }
+
+        const email = activate.userEmail
+            
+        const filter = {email}
+        const updateDocument = {
+            $set: {
+                telefone
+            }
+        }
+
+        await this.users.updateOne(filter,updateDocument)
 
         return res.status(200).send({msg: "Telefone ativado com sucesso!"})
     }

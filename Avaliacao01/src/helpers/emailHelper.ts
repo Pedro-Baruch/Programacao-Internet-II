@@ -24,29 +24,50 @@ export const sendActivateEmail = async (email: string, content: Promise<number>)
     })
 }
 
-export const generateCode = async (email: string) => {
+export const createCodeEmail = async (email: string) => {
 
     const activateEmail = db.collection<ActivateEmail>('ActivateEmail')
-    let code: number = generateNum()
-    
-    const foundCode = await activateEmail.findOne({code})
-
-    for(code;code <= 9999; code = generateNum()){} // verifica se codigo é maior que 4 digitos
-
-    if(foundCode){ // verifica se existe com código igual no db
-        for(code; code == foundCode.code || code <= 9999; code = generateNum()){}
-    }
+    let code: number = await generateCode()
 
     const currentDate = Math.floor(Date.now() / 1000)
-    const expDate = currentDate - 7200
+    const iatDate: number = currentDate
     
     const activate = {
         userEmail: email,
         code,
-        expDate
+        iatDate
     }
 
     await activateEmail.insertOne(activate)
+
+    return code
+}
+
+export const refreshCode = async (email: string) => {
+    
+    const activateEmail = db.collection<ActivateEmail>('ActivateEmail')
+    let code: number = await generateCode()
+
+    const currentDate = Math.floor(Date.now() / 1000)
+    const iatDate: number = currentDate
+
+    const filter = {userEmail: email}
+    const updateDocument = {
+        $set: {
+            userEmail: email,
+            code,
+            iatDate
+        }
+    }
+
+    await activateEmail.updateOne(filter,updateDocument)
+}
+
+const generateCode = async () => {
+    
+    let code: number = generateNum()
+
+    for(code;code <= 9999; code = generateNum()){} // verifica se codigo é maior que 4 digitos
 
     return code
 }
