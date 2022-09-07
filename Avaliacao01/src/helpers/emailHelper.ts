@@ -54,7 +54,6 @@ export const refreshCode = async (email: string) => {
     const filter = {userEmail: email}
     const updateDocument = {
         $set: {
-            userEmail: email,
             code,
             iatDate
         }
