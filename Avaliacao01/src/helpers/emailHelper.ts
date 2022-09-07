@@ -2,7 +2,7 @@ import nodemailer from "nodemailer"
 import { db } from "../data/mongodb"
 import { ActivateEmail } from "../repository/activateEmailRepository"
 
-export const activateAccountEmail = async (email: string, content: Promise<number>) => {
+export const sendActivateEmail = async (email: string, content: Promise<number>) => {
 
     const user: string = process.env.nodemailerUser?? ''
     const pass: string = process.env.nodemailerPass?? ''

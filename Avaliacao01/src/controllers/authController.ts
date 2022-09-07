@@ -3,7 +3,7 @@ import { User } from "../repository/userRepository";
 import { Request, Response } from "express";
 import { decrypt, encrypt } from "../helpers/passHelper";
 import { generateToken, refreshVerifyJWT } from "../helpers/tokenHelper";
-import { activateAccountEmail, generateCode } from "../helpers/emailHelper";
+import { sendActivateEmail, generateCode } from "../helpers/emailHelper";
 import { ActivateEmail } from "../repository/activateEmailRepository";
 import { generateCodeTelefone } from "../helpers/telefoneHelper";
 import { ActivateTelefone } from "../repository/activeTelefone";
@@ -46,7 +46,7 @@ export class AuthController{
         }
 
         const code = generateCode(email)
-        activateAccountEmail(email, code)
+        sendActivateEmail(email, code)
         
         // Salvando no banco de dados
         await this.users.insertOne(user)
@@ -68,7 +68,7 @@ export class AuthController{
         const currentDate = Math.floor(Date.now() / 1000)
         const valid = foundCode.expDate - currentDate
 
-        if(valid > 7200){
+        if(valid < 7200){
             return res.status(400).send({error: 'Código inválido'})
         }
 
@@ -86,6 +86,10 @@ export class AuthController{
         }
         
         return res.status(200).send({msg: 'Conta ativada com sucesso!'})
+    }
+
+    public refreshEmail = async (req: Request, res: Response) => {
+        
     }
     
     public addTelefone = async (req: Request, res: Response) => {
@@ -112,6 +116,10 @@ export class AuthController{
         return res.status(201).send({msg: "OK :)"})
     }
 
+    public refreshTelefone = async (req: Request, res: Response) => {
+
+    }
+
     public activateTelefone = async (req: Request, res: Response) =>{
 
         const {telefone, code} = req.body
@@ -120,6 +128,13 @@ export class AuthController{
 
         if(!activate){
             return res.status(404).send({error: "Telefone não registrado!"})
+        }
+
+        const currentDate = Math.floor(Date.now() / 1000)
+        const valid = activate.expDate - currentDate
+
+        if(valid < 3600){
+            return res.status(400).send({error: 'Código inválido'})
         }
 
         if(activate.code == code){
@@ -168,7 +183,6 @@ export class AuthController{
         }
     }
 
-    
     public refresh = async (req: Request, res: Response) => {
         
         const auth = req.headers.authorization
