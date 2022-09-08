@@ -2,7 +2,7 @@ import nodemailer from "nodemailer"
 import { db } from "../data/mongodb"
 import { ActivateEmail } from "../repository/activateEmailRepository"
 
-export const sendActivateEmail = async (email: string, content: Promise<number>) => {
+export const sendActivateEmail = async (email: string, content: number) => {
 
     const user: string = process.env.nodemailerUser?? ''
     const pass: string = process.env.nodemailerPass?? ''
@@ -60,17 +60,15 @@ export const refreshCode = async (email: string) => {
     }
 
     await activateEmail.updateOne(filter,updateDocument)
-}
-
-const generateCode = async () => {
-    
-    let code: number = generateNum()
-
-    for(code;code <= 9999; code = generateNum()){} // verifica se codigo é maior que 4 digitos
 
     return code
 }
 
-const generateNum = () => {
-    return Math.floor(Math.random() * 65536)
+const generateCode = async () => {
+    
+    let code: number = Math.floor(Math.random() * 65536)
+
+    for(code;code <= 9999; code = Math.floor(Math.random() * 65536)){} // verifica se codigo é maior que 4 digitos
+
+    return code
 }

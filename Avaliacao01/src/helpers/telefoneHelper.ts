@@ -38,17 +38,15 @@ export const refreshTelefone = async (telefone: number) => {
     }
 
     await activateTelefone.updateOne(filter,updateDocument)
-}
-
-const generateCode = async () => {
-
-    let code: number = generateNum()
-    
-    for(code;code <= 9999; code = generateNum()){}
 
     return code
 }
 
-const generateNum = () => {
-    return Math.floor(Math.random() * 65536)
+const generateCode = async () => {
+
+    let code: number = Math.floor(Math.random() * 65536)
+    
+    for(code;code <= 9999; code = Math.floor(Math.random() * 65536)){}
+
+    return code
 }

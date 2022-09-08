@@ -45,7 +45,7 @@ export class AuthController{
             accessIAT: 0
         }
 
-        const code = createCodeEmail(email)
+        const code = await createCodeEmail(email)
         sendActivateEmail(email, code)
         
         // Salvando no banco de dados
@@ -93,10 +93,16 @@ export class AuthController{
     public refreshEmail = async (req: Request, res: Response) => {
         
         const {email} = req.body
-        
-        await refreshCode(email)
+        const foundUser = await this.users.findOne({email})
 
-        return res.status(200).send({msg: email})
+        if(!foundUser){
+            return res.status(404).send({error: 'Usuário não encontrado'})
+        }
+
+        const code: number = await refreshCode(email)
+        sendActivateEmail(email,code)
+
+        return res.status(200).send({msg: 'Codigo atualizado!'})
     }
     
     public addTelefone = async (req: Request, res: Response) => {
@@ -121,15 +127,6 @@ export class AuthController{
         console.log('Ativação por sms do número:',telefone,'->',await code)
 
         return res.status(201).send({msg: "OK :)"})
-    }
-
-    public refreshTelefone = async (req: Request, res: Response) => {
-        
-        const {telefone} = req.body
-
-        refreshTelefone(telefone)
-
-        return res.status(200).send({msg: telefone})
     }
 
     public activateTelefone = async (req: Request, res: Response) =>{
@@ -165,6 +162,22 @@ export class AuthController{
         await this.users.updateOne(filter,updateDocument)
 
         return res.status(200).send({msg: "Telefone ativado com sucesso!"})
+    }
+
+    public refreshTelefone = async (req: Request, res: Response) => {
+        
+        const {telefone} = req.body
+
+        const activateTelefone = await db.collection<ActivateTelefone>('activateTelefone').findOne({userTelefone: telefone})
+
+        if(!activateTelefone){
+            return res.status(404).send({error: 'Telefone não foi encontrado!'})
+        }
+
+        const code = await refreshTelefone(telefone)
+        console.log("Código de ativação do número:", code)
+
+        return res.status(200).send({msg: 'Codigo atualizado!'})
     }
 
     public singin = async (req: Request, res: Response) => {
