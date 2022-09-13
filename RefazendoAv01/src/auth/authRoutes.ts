@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "./authController";
-import { schema } from "../helpers/celebrateHelper";
+import { schema } from "../authHelpers/celebrateHelper";
 
 const authRouter = Router()
 const authController = new AuthController()

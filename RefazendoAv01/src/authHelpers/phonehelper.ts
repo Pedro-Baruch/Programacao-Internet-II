@@ -2,12 +2,22 @@ import { db } from "../data/mongoDB"
 import { PhoneActive } from "../models/phoneActivateModel"
 import { User } from "../models/userModel"
 import { generateCode } from "./generateCodeHelper"
+import { Twilio } from 'twilio'
 
 export const sendActivatePhone = async(phone: string) => {
     
+    const accountSid = process.env.TWILIO_ACCOUNT_SID?? '';
+    const authToken = process.env.TWILIO_AUTH_TOKEN?? '';
+    const twilioNumber = process.env.TWILIO_PHONE_NUMBER?? '';
+
+    const client = new Twilio(accountSid,authToken)
     const content = await saveCode(phone)
-    
-    console.log('Código do telefone ->',content)
+
+    client.messages.create({
+        body: `Código de ativação -> ${content}`,
+        from: twilioNumber,
+        to: phone
+    }).catch(err => console.log(err))
 }
 
 const saveCode = async(phone: string) => {

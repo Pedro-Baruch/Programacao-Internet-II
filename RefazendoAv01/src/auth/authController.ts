@@ -1,9 +1,9 @@
 import { db } from "../data/mongoDB";
 import { User } from "../models/userModel";
 import { Request, Response } from "express";
-import { encrypt } from "../helpers/encryptHelper";
-import { sendActivateEmail } from "../helpers/emailHelper";
-import { sendActivatePhone } from "../helpers/phonehelper";
+import { encrypt } from "../authHelpers/encryptHelper";
+import { sendActivateEmail } from "../authHelpers/emailHelper";
+import { sendActivatePhone } from "../authHelpers/phonehelper";
 
 export class AuthController{
 
@@ -36,7 +36,6 @@ export class AuthController{
 
         const result = await this.users.insertOne(user)
         sendActivateEmail(user.email)
-        sendActivatePhone(user.phone)
 
         return res.status(201).send({msg: result.acknowledged, success: 'Registrado com sucesso!'})
     }
