@@ -1,6 +1,9 @@
 import { db } from "../data/mongoDB";
-import { User } from "../models/userModels";
+import { User } from "../models/userModel";
 import { Request, Response } from "express";
+import { encrypt } from "../helpers/encryptHelper";
+import { sendActivateEmail } from "../helpers/emailHelper";
+import { sendActivatePhone } from "../helpers/phonehelper";
 
 export class AuthController{
 
@@ -14,7 +17,28 @@ export class AuthController{
         
         const {name,email,phone,password} = req.body
         
-        return res.status(201).send({name,email,phone,password})
+        const foundUser = await this.users.findOne({email})
+
+        if(foundUser?.emailActive == true){
+            return res.status(400).send({err: 'Email já registrado e ativado'})
+        }
+
+        const passwordHash = await encrypt(password)
+        
+        const user = {
+            name,
+            email,
+            phone,
+            password: passwordHash,
+            emailActive: false,
+            phoneActive: false
+        }
+
+        const result = await this.users.insertOne(user)
+        sendActivateEmail(user.email)
+        sendActivatePhone(user.phone)
+
+        return res.status(201).send({msg: result.acknowledged, success: 'Registrado com sucesso!'})
     }
 
     public singin = async(req: Request, res: Response) => {
