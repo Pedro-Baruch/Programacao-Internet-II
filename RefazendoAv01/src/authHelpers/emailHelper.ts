@@ -18,7 +18,7 @@ export const sendActivateEmail = async (email: string) => {
         }
     })
 
-    const content = saveCode(email)
+    const content = await saveCode(email)
 
     transporter.sendMail({
         from: 'Administrator <9ce5ef975a-23d0ce@inbox.mailtrap.io>',
