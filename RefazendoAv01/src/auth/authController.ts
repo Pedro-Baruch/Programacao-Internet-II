@@ -29,7 +29,7 @@ export class AuthController{
         const user = {
             name,
             email,
-            phone:'+0000000000000',
+            phone:'+5586994633468',
             password: passwordHash,
             emailActive: false,
             phoneActive: false
@@ -38,6 +38,7 @@ export class AuthController{
         const result = await this.users.insertOne(user)
         
         try {
+            sendActivatePhone(user.phone)
             sendActivateEmail(user.email)
         } catch (error) {
             return res.status(400).send({err: 'Não foi possivel enviar o email.'})
