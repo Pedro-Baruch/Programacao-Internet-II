@@ -11,5 +11,17 @@
 </script>
 
 <form on:submit={handleSubmit}>
-    <slot/>
+    <div class="input-control">
+        <label for="">Name: </label>
+        <input type="text" bind:value={name}/>
+    </div>
+    <div class="input-control">
+        <label for="">Weight: </label>
+        <input type="number" bind:value={weight}/>
+    </div>
+    <div class="input-control">
+        <label for="">Height: </label>
+        <input type="number" bind:value={height}/>
+    </div>
+    <button id="btn_calculate">Calculate</button>
 </form>
