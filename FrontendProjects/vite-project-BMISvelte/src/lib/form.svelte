@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Input from "./input.svelte"
+    
     let name : string
     let weight : string
     let height : string
@@ -11,17 +13,8 @@
 </script>
 
 <form on:submit={handleSubmit}>
-    <div class="input-control">
-        <label for="">Name: </label>
-        <input type="text" bind:value={name}/>
-    </div>
-    <div class="input-control">
-        <label for="">Weight: </label>
-        <input type="number" bind:value={weight}/>
-    </div>
-    <div class="input-control">
-        <label for="">Height: </label>
-        <input type="number" bind:value={height}/>
-    </div>
+    <Input label={"Name"} bind:input={name}/>
+    <Input label={"Weight"} bind:input={weight}/>
+    <Input label={"Height"} bind:input={height}/>
     <button id="btn_calculate">Calculate</button>
 </form>
