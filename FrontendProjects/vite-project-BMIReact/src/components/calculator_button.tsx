@@ -5,6 +5,6 @@ interface CalculatorButton{
     label?: string
 }
 
-export const BMIButton = ({label = 'Calculate',onClickCallback}: CalculatorButton) => {
+export const CalculatorButton = ({label = 'Calculate',onClickCallback}: CalculatorButton) => {
     return <button id="btn_calculate" onClick={onClickCallback}>{label}</button>
 }

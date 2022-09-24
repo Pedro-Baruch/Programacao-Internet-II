@@ -3,7 +3,7 @@ import './App.css'
 import { useState } from 'react'
 import { BMIHeader } from './components/bmi_header'
 import { BMIFooter } from './components/bmi_footer'
-import { BMIButton } from './components/calculator_button'
+import { CalculatorButton } from './components/calculator_button'
 
 function App() { 
   
@@ -40,7 +40,7 @@ function App() {
             <Input type = {'text'} label = {'Name: '} input={name} onChangeCallback={onChangeFunctionName} />
             <Input type = {'number'} label = {'Weight: '} input = {weight} onChangeCallback={onChangeFunctionWeight} />
             <Input type = {'number'} label = {'Height: '} input={height} onChangeCallback={onChangeFunctionHeight} />
-            <BMIButton onClickCallback={onClickHandler} />  
+            <CalculatorButton onClickCallback={onClickHandler} />  
           </form>
         </main>
         <BMIFooter/>
