@@ -11,9 +11,7 @@ export function Input({input,label,type, onChangeCallback}:InputProps){
     return (
         <div className="input-control">
             <label htmlFor="">{label}</label>
-            <input type={type} 
-            value={input} 
-            onChange={onChangeCallback} /> 
+            <input type={type} value={input} onChange={onChangeCallback} /> 
         </div>
     )
 }
