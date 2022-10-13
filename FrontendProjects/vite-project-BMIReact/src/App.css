@@ -113,6 +113,22 @@ form #btn_calculate:hover{
     border-radius: 1rem;
 }
 
+#result{
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+
+    /* visibility: hidden; */
+    /* display: none; */
+}
+
+#result span{
+    font-weight: bold;
+    padding-left: 1rem;
+}
+
 Footer{
     border-top: 2px solid #fce4ec;
     height: 2rem;

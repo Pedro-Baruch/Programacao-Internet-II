@@ -10,6 +10,7 @@ function App() {
   const [name, setName] = useState('')
   const [weight, setWeight] = useState('')
   const [height, setHeight] = useState('')
+  const [bmi,setBmi] = useState('')
 
   const onChangeFunctionName = (event: any) => {
     setName(event.target.value);
@@ -25,9 +26,8 @@ function App() {
 
   const onClickHandler = () => {
 
-    const BMI = Math.floor(Number(weight) / (Number(height) * Number(height)))
-    
-    alert(`${name} seu BMI é de ${BMI}`)
+    const bmi = Math.floor(Number(weight) / (Number(height) * Number(height)))
+    setBmi(bmi.toString())
   }
 
   return (
@@ -42,6 +42,10 @@ function App() {
             <Input type = {'number'} label = {'Height: '} input={height} onChangeCallback={onChangeFunctionHeight} />
             <CalculatorButton onClickCallback={onClickHandler} />  
           </form>
+          <section id="result" onClick={onClickHandler}>Seu BMI:
+            <span id="bmi">{bmi}</span>
+          </section>
+          
         </main>
         <BMIFooter/>
       </div>
