@@ -1,0 +1,38 @@
+*{
+  background-color: black;
+  color: white;
+  text-decoration: none;
+}
+
+li{
+  list-style-type: none;
+}
+
+.App{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+header{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.Menu ul{
+  display: flex;
+  flex-direction: row;
+
+  justify-content: center;
+  gap: 1rem;
+}
+
+.Menu ul li{
+  cursor: pointer;
+}
+
+.Menu ul li:hover{
+  font-weight: bold;
+}
+
