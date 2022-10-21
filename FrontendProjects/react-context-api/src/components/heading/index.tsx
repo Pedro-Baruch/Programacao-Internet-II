@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { levelContext } from "../../context/levelContext";
 import "../heading/styles.css"
 
-export default function Heading({ children }: { children: JSX.Element | string}): JSX.Element {
+export default function Heading({ children }: { children: JSX.Element | string}){
   const level = useContext(levelContext);
 
   switch (level) {

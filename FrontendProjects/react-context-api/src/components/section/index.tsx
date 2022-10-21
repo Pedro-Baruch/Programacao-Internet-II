@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { levelContext } from "../../context/levelContext";
 import "../section/styles.css"
 
-export default function Section({ children }: { children: JSX.Element[]}) {
+export default function Section({ children }: { children: JSX.Element[]}): JSX.Element {
   const level = useContext(levelContext)
   return (
     <section className="Section-Element">
