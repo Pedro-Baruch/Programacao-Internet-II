@@ -2,61 +2,36 @@ import React, { useReducer, useState } from "react";
 import "./App.css";
 import { AddTask } from "./components/add_task";
 import { TaskList } from "./components/list_task";
+import { useCallback } from "react";
+import {
+  ActionType,
+  appStateReducer,
+  initialState,
+} from "./reducers/app_reducer";
 
 export default function App() {
-  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
+  const [state, dispatch] = useReducer(appStateReducer, initialState);
 
   function handleAddTask(text: string) {
     dispatch({
-      type: "added",
-      id: nextId++,
-      text: text,
+      type: ActionType.Added,
+      args: { text },
     });
   }
 
   function handleChangeTask(task: Task) {
     dispatch({
-      type: "changed",
-      task: task,
+      type: ActionType.Changed,
+      args: { task },
     });
   }
 
-  function handleDeleteTask(taskId: number) {
+  const handleDeleteTask = useCallback((id: number) => {
     dispatch({
-      type: "deleted",
-      id: taskId,
+      type: ActionType.Deleted,
+      args: { id },
     });
-  }
-
-  function taskReducer(tasks: Task, action: any) {
-    switch (action.type) {
-      case 'added': {
-        return [
-          ...tasks,
-          {
-            id: action.id,
-            text: action.text,
-            done: false,
-          },
-        ];
-      }
-      case 'changed': {
-        return tasks.map((t: Task) => {
-          if (t.id === action.task.id) {
-            return action.task;
-          } else {
-            return t;
-          }
-        });
-      }
-      case 'deleted': {
-        return tasks.filter((t: Task) => t.id !== action.id);
-      }
-      default: {
-        throw Error("Unknown action: " + action.type);
-      }
-    }
-  }
+  }, []);
 
   return (
     <div className="App">
@@ -66,7 +41,7 @@ export default function App() {
       <AddTask onAddTask={handleAddTask} />
 
       <TaskList
-        tasks={tasks}
+        tasks={state.tasks}
         onChangeTask={handleChangeTask}
         onDeleteTask={handleDeleteTask}
       />
@@ -79,11 +54,3 @@ export interface Task {
   text: string;
   done: boolean;
 }
-
-let nextId = 3;
-
-const initialTasks: Task[] = [
-  { id: 0, text: "Elaborar Aulas", done: true },
-  { id: 1, text: "Estudar Flutter - Estados", done: false },
-  { id: 2, text: "Correr avenida Raul Lopres", done: false },
-];
